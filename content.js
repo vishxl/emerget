@@ -170,33 +170,9 @@
     }
   }
 
-  async function diagnose() {
-    try {
-      const jobId = await getJobId();
-      const d = await apiGet(`/v1/jobs/${jobId}/timeline?flags=true&main_only=true&limit=500`);
-      const evs = d.events || [];
-      const types = {};
-      evs.forEach((e) => { types[e.event_type] = (types[e.event_type] || 0) + 1; });
-      const samples = {};
-      for (const e of evs) {
-        if (!samples[e.event_type]) samples[e.event_type] = JSON.stringify(e.payload).slice(0, 400);
-      }
-      report({ state: 'diag', jobId, total: evs.length,
-        hasMoreOlder: d.has_more_older, cursor: d.older_than_cursor,
-        types, samples: Object.fromEntries(Object.entries(samples).slice(0, 12)) });
-    } catch (e) {
-      report({ state: 'diag', error: 'Diag failed: ' + (e && e.message ? e.message : e) });
-    }
-  }
-
   chrome.runtime.onMessage.addListener((msg, _s, sendResponse) => {
     if (msg && msg.type === 'EMERGET_CAPTURE') {
       capture();
-      sendResponse({ ok: true });
-    } else if (msg && msg.type === 'EMERGET_DIAG') {
-      diagnose();
-      sendResponse({ ok: true });
-    } else if (msg && msg.type === 'EMERGET_PING') {
       sendResponse({ ok: true });
     }
     return false;

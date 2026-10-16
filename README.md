@@ -22,6 +22,7 @@ Emergent's chat UI virtualizes its message list and collapses long content ("Sho
 - **Chronologically ordered** — events are reversed from newest-first API order into true conversation order
 - **Faithful rendering** — user inputs stay separate turns; assistant messages, tool tiles ("Viewing 6 paths", "Reading logs: tail -20 …") and delegation notes appear just as the UI shows them
 - **Smart deduplication** — terminal events (`AssistantFinalText`, `AgentFinished`) that repeat the turn's last message are detected and dropped, so nothing appears twice
+- **Branded exports** — every file opens with the chat's name, source URL, export date, message count, and `[USER]`/`[ASSISTANT]` labels
 - **Four export formats** — plain transcript (`.txt`), Markdown (`.md`), raw JSON, and a **resume prompt** you can paste into a new chat to continue where you left off
 - **Private by design** — the session token never leaves your browser; every request goes to Emergent's own API from your own logged-in tab. No external servers, no analytics, no accounts.
 - **Diagnostics built in** — one click dumps the raw event-type mix to help troubleshoot when Emergent changes its API
@@ -76,7 +77,7 @@ The session token is read from your logged-in tab's own localStorage and sent on
 ## Compatibility
 
 - Built against the Emergent UI/API as of early 2026 (chat v3 experience)
-- If Emergent changes its API and capture starts failing, click **Diag** in the popup and open an issue with the output — it records the exact event-type mix the server returned
+- If a future Emergent update changes its API and capture starts failing, open an issue with the browser console output — the capture engine is a small, well-documented module that's easy to re-point
 
 ## Privacy
 
@@ -103,7 +104,7 @@ Run the tests (plain Node, no dependencies):
 node --test test/
 ```
 
-Load the unpacked extension, reload after edits, and click **Diag** to inspect the live event stream when debugging.
+Load the unpacked extension, reload after edits, and use the popup's JSON format to inspect what a capture produced when debugging.
 
 ## License
 

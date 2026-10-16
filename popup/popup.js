@@ -13,13 +13,35 @@ const el = {
 };
 
 let messages = [];
-let title = 'emergent-chat';
+let meta = { title: 'Emergent chat', url: '' };
 
 const stamp = () => new Date().toISOString().replace(/[:T]/g, '-').slice(0, 16);
 
+function headerBlock(kind) {
+  if (kind === 'md') {
+    return [
+      `# ${meta.title} — Emergent chat export`,
+      '',
+      `> Exported with [Emerget](https://github.com/vishxl/emerget) · ${new Date().toLocaleString()}`,
+      `> Source: ${meta.url} · ${messages.length} messages`,
+      '',
+    ].join('\n');
+  }
+  return [
+    '=== Emerget — Emergent Chat Export ===',
+    'Chat: ' + meta.title,
+    'Source: ' + meta.url,
+    'Exported: ' + new Date().toLocaleString(),
+    'Messages: ' + messages.length,
+    '',
+  ].join('\n');
+}
+
 function fmtTranscript(msgs) {
-  // mirrors the manual copy: message text, then its timestamp line
-  return msgs.map((m) => m.text + (m.ts ? '\n' + m.ts : '')).join('\n\n');
+  // labeled transcript: [USER]/[ASSISTANT], message text, timestamp line
+  return msgs
+    .map((m) => (m.role === 'user' ? '[USER]' : '[ASSISTANT]') + '\n' + m.text + (m.ts ? '\n' + m.ts : ''))
+    .join('\n\n');
 }
 
 function fmtMarkdown(msgs) {
@@ -32,7 +54,7 @@ function fmtMarkdown(msgs) {
 function fmtResume(msgs) {
   const lines = [
     '=== EMERGENT CHAT HISTORY - RESUME PROMPT ===',
-    'Date: ' + new Date().toISOString(),
+    'Exported with Emerget — ' + new Date().toISOString(),
     'Messages: ' + msgs.length,
     '',
     'The following is my complete previous conversation. Read the full history',
@@ -50,11 +72,21 @@ function fmtResume(msgs) {
   return lines.join('\n');
 }
 
+function fmtJson(msgs) {
+  return JSON.stringify({
+    exported_by: 'Emerget (https://github.com/vishxl/emerget)',
+    exported_at: new Date().toISOString(),
+    chat_title: meta.title,
+    source_url: meta.url,
+    messages: msgs,
+  }, null, 2);
+}
+
 const formatters = {
-  transcript: fmtTranscript,
-  markdown: fmtMarkdown,
+  transcript: (m) => headerBlock('txt') + '\n' + fmtTranscript(m),
+  markdown: (m) => headerBlock('md') + '\n' + fmtMarkdown(m),
   resume: fmtResume,
-  json: (m) => JSON.stringify(m, null, 2),
+  json: fmtJson,
 };
 
 function currentText() {
@@ -66,9 +98,9 @@ function currentText() {
 function render() {
   el.preview.hidden = !messages.length;
   if (messages.length) {
-    el.preview.textContent =
-      currentText().text.slice(0, 600) + (currentText().text.length > 600 ? '…' : '');
-    el.meta.textContent = `${messages.length} messages · ${title}`;
+    const text = currentText().text;
+    el.preview.textContent = text.slice(0, 600) + (text.length > 600 ? '…' : '');
+    el.meta.textContent = `${messages.length} messages · ${meta.title}`;
   } else {
     el.meta.textContent = '';
   }
@@ -83,7 +115,7 @@ async function refresh() {
   if (s.state === 'running') el.primary.disabled = true;
   if (s.state === 'done' && s.messages) {
     messages = s.messages;
-    title = s.title || title;
+    meta = { title: s.title || meta.title, url: s.url || meta.url };
     el.primary.disabled = false;
     el.status.textContent = `Captured ${s.count} messages in order.`;
     render();
@@ -94,9 +126,15 @@ chrome.storage.onChanged.addListener((ch, area) => {
   if (area === 'local' && ch[stateKey]) refresh();
 });
 
-el.primary.addEventListener('click', async () => {
+async function activeEmergentTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id || !/app\.emergent\.sh/.test(tab.url || '')) {
+  if (!tab?.id || !/app\.emergent\.sh/.test(tab.url || '')) return null;
+  return tab;
+}
+
+el.primary.addEventListener('click', async () => {
+  const tab = await activeEmergentTab();
+  if (!tab) {
     el.status.textContent = 'Open an app.emergent.sh chat tab first.';
     return;
   }
@@ -145,32 +183,10 @@ el.download.addEventListener('click', () => {
   const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${title.replace(/[^\w-]+/g, '_')}_${stamp()}.${ext}`;
+  a.download = `emerget_${meta.title.replace(/[^\w-]+/g, '_').slice(0, 40)}_${stamp()}.${ext}`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   el.status.textContent = 'Downloaded.';
-});
-
-document.getElementById('diag').addEventListener('click', async () => {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id || !/app\.emergent\.sh/.test(tab.url || '')) {
-    el.status.textContent = 'Open an app.emergent.sh tab first.';
-    return;
-  }
-  try {
-    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
-  } catch (_) {}
-  await chrome.storage.local.remove(stateKey);
-  chrome.tabs.sendMessage(tab.id, { type: 'EMERGET_DIAG' }, () => void chrome.runtime.lastError);
-  el.status.textContent = 'Diag running… results appear in the Downloaded text (switch format to JSON).';
-  setTimeout(async () => {
-    const { [stateKey]: s } = await chrome.storage.local.get(stateKey);
-    if (s && s.state === 'diag') {
-      messages = [{ role: 'user', text: JSON.stringify(s, null, 2) }];
-      render();
-      el.status.textContent = 'Diag done — Copy/Download shows the JSON.';
-    }
-  }, 6000);
 });
 
 el.fmt.addEventListener('change', render);
