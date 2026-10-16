@@ -14,6 +14,8 @@
 
 Emerget is a Chrome extension that exports the **entire conversation** from an Emergent.sh chat — every user prompt, every assistant response, every tool action — in the same order you see in the app.
 
+<img src="docs/screenshot.png" alt="Emerget popup showing a captured chat with its project name, format picker, and live preview" width="360" align="right" />
+
 Emergent's chat UI virtualizes its message list and collapses long content ("Show more"), so manually copying a conversation gives you fragments in the wrong order. Emerget talks to Emergent's own timeline API instead: it paginates the full event history server-side and renders it faithfully. No scrolling marathon, no copy-paste across hundreds of messages, no lost turns.
 
 ## Features
