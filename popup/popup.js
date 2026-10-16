@@ -22,7 +22,7 @@ function headerBlock(kind) {
     return [
       `# ${meta.title} — Emergent chat export`,
       '',
-      `> Exported with [Emerget](https://github.com/vishxl/emerget) · ${new Date().toLocaleString()}`,
+      `> Exported with Emerget · ${new Date().toLocaleString()}`,
       `> Source: ${meta.url} · ${messages.length} messages`,
       '',
     ].join('\n');
@@ -74,7 +74,7 @@ function fmtResume(msgs) {
 
 function fmtJson(msgs) {
   return JSON.stringify({
-    exported_by: 'Emerget (https://github.com/vishxl/emerget)',
+    exported_by: 'Emerget',
     exported_at: new Date().toISOString(),
     chat_title: meta.title,
     source_url: meta.url,

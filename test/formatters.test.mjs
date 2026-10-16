@@ -14,7 +14,7 @@ const headerBlock = (kind) => {
     return [
       `# ${meta.title} — Emergent chat export`,
       '',
-      `> Exported with [Emerget](https://github.com/vishxl/emerget) · ${new Date().toLocaleString()}`,
+      `> Exported with Emerget · ${new Date().toLocaleString()}`,
       `> Source: ${meta.url} · ${messages.length} messages`,
       '',
     ].join('\n');
@@ -66,7 +66,7 @@ const fmtResume = (msgs) => {
 
 const fmtJson = (msgs) =>
   JSON.stringify({
-    exported_by: 'Emerget (https://github.com/vishxl/emerget)',
+    exported_by: 'Emerget',
     exported_at: new Date().toISOString(),
     chat_title: meta.title,
     source_url: meta.url,
@@ -102,7 +102,8 @@ test('markdown header brands the file and labels turns', () => {
   messages = sample;
   const t = headerBlock('md') + '\n' + fmtMarkdown(sample);
   assert.ok(t.startsWith('# Route Optimizer — Emergent chat export'));
-  assert.ok(t.includes('[Emerget](https://github.com/vishxl/emerget)'));
+  assert.ok(t.includes('Exported with Emerget'));
+  assert.ok(!t.includes('github.com'));
   assert.equal((t.match(/^## .+$/gm) || []).length, 3);
   assert.ok(t.includes('---\n\n## Assistant'));
 });
