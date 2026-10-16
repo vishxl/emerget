@@ -59,7 +59,7 @@
     //    picks the latest fetch, not a stale one.
     const entries = performance.getEntriesByType('resource');
     for (let i = entries.length - 1; i >= 0; i--) {
-      const pm = (entries[i].name || '').match(/\/jobs\/v0\/([0-9a-f]{8}-[0-9a-f-]{27,36})\/timeline/);
+      const pm = (entries[i].name || '').match(/\/jobs\/(?:v0\/|v1\/)?([0-9a-f]{8}-[0-9a-f-]{27,36})\/timeline/);
       if (pm) return pm[1];
     }
     // 3. Last resort: the account's most recent job. ponytail: only correct
