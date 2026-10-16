@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    :root { color-scheme: dark; }
+    body { width: 340px; margin: 0; font: 13px -apple-system, system-ui, sans-serif; background: #0d1117; color: #e6edf3; }
+    header { display: flex; align-items: center; gap: 8px; padding: 12px 14px 6px; }
+    header h1 { font-size: 15px; margin: 0; letter-spacing: .3px; }
+    header span { color: #7d8590; font-size: 11px; }
+    main { padding: 8px 14px 14px; }
+    #status { color: #7d8590; font-size: 12px; min-height: 16px; margin-bottom: 8px; }
+    #bar { height: 4px; background: #21262d; border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+    #bar i { display: block; height: 100%; width: 0; background: #2ea043; transition: width .3s; }
+    .btns { display: flex; gap: 8px; }
+    button { flex: 1; padding: 8px 6px; border: 1px solid #30363d; border-radius: 6px; background: #161b22; color: #e6edf3; font-size: 12px; cursor: pointer; }
+    button:hover { background: #21262d; }
+    button:disabled { opacity: .4; cursor: default; }
+    #primary { background: #238636; border-color: #2ea043; font-weight: 600; }
+    #primary:hover { background: #2ea043; }
+    #fmt { width: 100%; margin: 10px 0 8px; font-size: 12px; background: #161b22; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; padding: 6px; }
+    #preview { max-height: 120px; overflow-y: auto; font-size: 11px; color: #7d8590; white-space: pre-wrap; border: 1px solid #21262d; border-radius: 6px; padding: 8px; margin-bottom: 10px; }
+    .meta { color: #7d8590; font-size: 11px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Emerget</h1><span>full chat export</span>
+  </header>
+  <main>
+    <div id="status">Ready.</div>
+    <div id="bar"><i></i></div>
+    <div class="btns">
+      <button id="primary">Capture full chat</button>
+    </div>
+    <select id="fmt">
+      <option value="transcript">Transcript (.txt, like manual copy)</option>
+      <option value="markdown">Markdown (.md)</option>
+      <option value="resume">Resume prompt (for new chats)</option>
+      <option value="json">JSON (raw)</option>
+    </select>
+    <div id="preview" hidden></div>
+    <div class="btns">
+      <button id="copy" disabled>Copy</button>
+      <button id="download" disabled>Download</button>
+      <button id="diag" title="Dump timeline API event types + samples">Diag</button>
+    </div>
+    <div class="meta" id="meta"></div>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
