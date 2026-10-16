@@ -144,6 +144,21 @@
 
   // ---------- main ----------
 
+  // Current Emergent project name: job detail API first, then the workspace
+  // tab label, then document.title.
+  async function getJobName(jobId) {
+    try {
+      const d = await apiGet(`/jobs/v0/${jobId}/`);
+      const j = d.job || d.data || d;
+      for (const f of ['name', 'app_name', 'appName', 'project_name', 'title']) {
+        if (typeof j[f] === 'string' && j[f].trim()) return j[f].trim();
+      }
+    } catch (_) { /* fall through to DOM */ }
+    const tab = document.querySelector('[data-testid^="tab-tab-"]');
+    const t = tab && tab.textContent && tab.textContent.trim().replace(/[×✕]\s*$/, '');
+    return t || '';
+  }
+
   async function capture() {
     const started = Date.now();
     try {
@@ -156,6 +171,8 @@
         return;
       }
       const messages = eventsToMessages(events);
+      const docTitle = document.title.replace(/[-–].*$/, '').trim();
+      const name = (await getJobName(jobId)) || docTitle || 'emergent-chat';
       report({
         state: 'done',
         pct: 100,
@@ -163,7 +180,7 @@
         messages,
         count: messages.length,
         secs: Math.round((Date.now() - started) / 1000),
-        title: document.title.replace(/[-–].*$/, '').trim() || 'emergent-chat',
+        title: name,
       });
     } catch (e) {
       report({ state: 'error', error: 'Capture failed: ' + (e && e.message ? e.message : e), secs: Math.round((Date.now() - started) / 1000) });

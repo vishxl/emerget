@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Emerget — Export Emergent Chat History",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Export your complete Emergent.sh chat history in one click. Ordered, expandable, faithful to the original conversation — Markdown, TXT, JSON or resume prompt.",
   "permissions": ["storage", "scripting", "activeTab"],
   "host_permissions": ["*://app.emergent.sh/*"],

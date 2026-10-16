@@ -22,7 +22,7 @@ Emergent's chat UI virtualizes its message list and collapses long content ("Sho
 - **Chronologically ordered** — events are reversed from newest-first API order into true conversation order
 - **Faithful rendering** — user inputs stay separate turns; assistant messages, tool tiles ("Viewing 6 paths", "Reading logs: tail -20 …") and delegation notes appear just as the UI shows them
 - **Smart deduplication** — terminal events (`AssistantFinalText`, `AgentFinished`) that repeat the turn's last message are detected and dropped, so nothing appears twice
-- **Branded exports** — every file opens with the chat's name, source URL, export date, message count, and `[USER]`/`[ASSISTANT]` labels
+- **Branded exports** — every file opens with the project's real name (fetched from Emergent's own API), source URL, export date, message count, and `[USER]`/`[ASSISTANT]` labels; the filename carries it too
 - **Four export formats** — plain transcript (`.txt`), Markdown (`.md`), raw JSON, and a **resume prompt** you can paste into a new chat to continue where you left off
 - **Private by design** — the session token never leaves your browser; every request goes to Emergent's own API from your own logged-in tab. No external servers, no analytics, no accounts.
 
@@ -53,7 +53,7 @@ Emergent's chat UI virtualizes its message list and collapses long content ("Sho
 ```
 popup ──capture──▶ content script (emergent.sh tab)
                       │  1. read Supabase session token (localStorage)
-                      │  2. GET /__backend/jobs/v0/            → current job id
+                      │  2. GET /__backend/jobs/v0/<id>/        → project name
                       │  3. GET /__backend/v1/jobs/<id>/timeline?flags&older_than=…
                       │     (paginated with older_than cursor until exhausted)
                       │  4. reverse → chronological, map events → turns
