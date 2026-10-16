@@ -51,9 +51,19 @@
   }
 
   async function getJobId() {
-    // Prefer the live URL …/jobs/v0/<uuid>/; else take the job the open timeline fetch used.
+    // 1. Prefer the live URL …/jobs/v0/<uuid>/.
     const m = location.href.match(/jobs\/(?:v0\/)?([0-9a-f]{8}-[0-9a-f-]{27,36})/i);
     if (m) return m[1];
+    // 2. The page itself fetched the open chat's timeline — its URL carries the
+    //    real job id. Scan newest entry first so an SPA nav to another project
+    //    picks the latest fetch, not a stale one.
+    const entries = performance.getEntriesByType('resource');
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const pm = (entries[i].name || '').match(/\/jobs\/v0\/([0-9a-f]{8}-[0-9a-f-]{27,36})\/timeline/);
+      if (pm) return pm[1];
+    }
+    // 3. Last resort: the account's most recent job. ponytail: only correct
+    //    when the open chat IS that job; steps 1–2 should cover real usage.
     const tok = getToken();
     const r = await fetch(API + '/jobs/v0/?limit=1&offset=0', {
       credentials: 'include',
@@ -63,7 +73,6 @@
     const data = await r.json();
     const list = Array.isArray(data) ? data : data.jobs || data.items || [];
     if (!list.length) throw new Error('No recent jobs found for this account.');
-    // ponytail: first item assumed most recent; verify shape if it ever looks wrong
     return (list[0].job_id || list[0].id);
   }
 
