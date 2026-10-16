@@ -150,7 +150,7 @@
     try {
       const d = await apiGet(`/jobs/v0/${jobId}/`);
       const j = d.job || d.data || d;
-      for (const f of ['name', 'app_name', 'appName', 'project_name', 'title']) {
+      for (const f of ['display_title', 'title', 'name', 'app_name', 'appName', 'project_name']) {
         if (typeof j[f] === 'string' && j[f].trim()) return j[f].trim();
       }
     } catch (_) { /* fall through to DOM */ }
