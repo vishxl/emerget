@@ -54,9 +54,10 @@
     // 1. Prefer the live URL …/jobs/v0/<uuid>/.
     const m = location.href.match(/jobs\/(?:v0\/)?([0-9a-f]{8}-[0-9a-f-]{27,36})/i);
     if (m) return m[1];
-    // 2. The page itself fetched the open chat's timeline — its URL carries the
-    //    real job id. Scan newest entry first so an SPA nav to another project
-    //    picks the latest fetch, not a stale one.
+    // 2. Jobs the page itself fetched (recorded by inject.js, newest last).
+    const rec = (document.documentElement.getAttribute('data-emerget-jobs') || '').split(' ').filter(Boolean);
+    if (rec.length) return rec[rec.length - 1];
+    // 3. Chrome's request log — only covers captures before inject.js existed.
     const entries = performance.getEntriesByType('resource');
     for (let i = entries.length - 1; i >= 0; i--) {
       const pm = (entries[i].name || '').match(/\/jobs\/(?:v0\/|v1\/)?([0-9a-f]{8}-[0-9a-f-]{27,36})\/timeline/);

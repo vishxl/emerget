@@ -8,6 +8,12 @@
   "content_scripts": [
     {
       "matches": ["*://app.emergent.sh/*"],
+      "js": ["inject.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["*://app.emergent.sh/*"],
       "js": ["content.js"],
       "run_at": "document_idle"
     }
