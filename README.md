@@ -25,7 +25,6 @@ Emergent's chat UI virtualizes its message list and collapses long content ("Sho
 - **Branded exports** — every file opens with the chat's name, source URL, export date, message count, and `[USER]`/`[ASSISTANT]` labels
 - **Four export formats** — plain transcript (`.txt`), Markdown (`.md`), raw JSON, and a **resume prompt** you can paste into a new chat to continue where you left off
 - **Private by design** — the session token never leaves your browser; every request goes to Emergent's own API from your own logged-in tab. No external servers, no analytics, no accounts.
-- **Diagnostics built in** — one click dumps the raw event-type mix to help troubleshoot when Emergent changes its API
 
 ## Install
 
