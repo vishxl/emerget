@@ -1,12 +1,16 @@
 <div align="center">
 
-<img src="docs/banner.png" alt="emerget" width="640" />
+<img src="docs/banner.png" alt="Emerget — export your Emergent.sh chat history (Chrome extension)" width="640" />
 
-**Export your complete [Emergent](https://app.emergent.sh) chat history — in one click.**
+# Emerget: Export Emergent Chat History
+
+**Download your complete [Emergent](https://app.emergent.sh) conversations as Markdown, TXT, JSON, or a resume prompt — in one click.**
 
 [![Chrome](https://img.shields.io/badge/Chrome-MV3%20Extension-4364f1?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-14%20passing-2ea043)](#development)
+[![Tests](https://img.shields.io/badge/tests-16%20passing-2ea043)](#development)
+
+[Get the source](https://github.com/vishxl/emerget) · [Report a bug](https://github.com/vishxl/emerget/issues) · [Request a feature](https://github.com/vishxl/emerget/issues)
 
 </div>
 
@@ -32,13 +36,18 @@ Emergent's chat UI virtualizes its message list and collapses long content ("Sho
 
 ## Install
 
-1. Download or clone this repository
-2. Open `chrome://extensions` in Chrome (or any Chromium browser: Edge, Brave, Arc)
+1. Download the repository (**Code → Download ZIP**), or clone it:
+   ```bash
+   git clone https://github.com/vishxl/emerget.git
+   ```
+2. Open `chrome://extensions` in Chrome (or `edge://extensions` in Edge)
 3. Enable **Developer mode** (top right)
-4. Click **Load unpacked** and select the `emerget/` folder
+4. Click **Load unpacked** and select the `emerget/` folder — the one containing `manifest.json`
 5. Pin the extension to your toolbar
 
-## Usage
+No account or API key — you just need to be signed in to Emergent in the same browser.
+
+## How to export an Emergent conversation
 
 1. Open the [Emergent chat](https://app.emergent.sh) you want to export
 2. Click the Emerget icon
@@ -77,20 +86,24 @@ Emergent's timeline is a stream of typed events (`InputReceived`, `AssistantText
 
 The session token is read from your logged-in tab's own localStorage and sent only to `app.emergent.sh`. Emerget requests no extra permissions beyond that one host.
 
-## Compatibility
+## Compatibility and troubleshooting
 
 - Built against the Emergent UI/API as of early 2026 (chat v3 experience)
-- If a future Emergent update changes its API and capture starts failing, open an issue with the browser console output — the capture engine is a small, well-documented module that's easy to re-point
+- If capture starts failing after an Emergent update: reload the Emergent tab, reload Emerget from `chrome://extensions`, and pull the latest version of this repo — the capture engine is a small, well-documented module that's easy to re-point
+- Still stuck? [Open an issue](https://github.com/vishxl/emerget/issues) with the error you see — **strip session tokens and private conversation content before sharing logs**
 
 ## Privacy
 
 Emerget has no backend. It reads your session token from the page you're logged into, calls Emergent's own endpoints, and stores the result in your browser's local extension storage. Nothing is transmitted anywhere else. Removing the extension removes all stored exports.
+
+Exports are plain files on your disk — check them for private prompts, credentials, or customer data before sharing.
 
 ## Development
 
 ```
 emerget/
 ├── manifest.json        # MV3, scoped to app.emergent.sh only
+├── inject.js            # records the job ids the page requests (main world)
 ├── content.js           # capture engine: auth → timeline pagination → renderer
 ├── popup/
 │   ├── popup.html       # UI
@@ -108,6 +121,28 @@ node --test test/
 ```
 
 Load the unpacked extension, reload after edits, and use the popup's JSON format to inspect what a capture produced when debugging.
+
+## FAQ
+
+### Can I download my Emergent chat history?
+
+Yes — open the conversation, click **Capture full chat**, and download it as Markdown, TXT, JSON, or a resume prompt.
+
+### Does it capture messages that aren't visible on screen?
+
+Yes. Emerget paginates Emergent's timeline API rather than reading the rendered DOM, so virtualized and collapsed ("Show more") messages are included.
+
+### Which formats are supported?
+
+Markdown, plain text, JSON, and a resume prompt for continuing work in a new chat.
+
+### Does Emerget send my conversations anywhere?
+
+No. It calls Emergent's own endpoints from your logged-in tab and stores the result in your browser. There is no Emerget server.
+
+### Is this an official Emergent extension?
+
+No. Emerget is independent and open source — not affiliated with or endorsed by Emergent.
 
 ## License
 
